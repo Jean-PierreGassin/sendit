@@ -1,10 +1,25 @@
 {
   "name": "@sendit/airdrop",
   "version": "0.1.0",
-  "private": true,
   "description": "Prebuilt Swift AirDrop engine (NSSharingService) emitting NDJSON transfer events. Runs on macOS only.",
+  "license": "MIT",
+  "homepage": "https://github.com/Jean-PierreGassin/sendit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jean-PierreGassin/sendit.git",
+    "directory": "packages/engines/macos/airdrop"
+  },
+  "bugs": {
+    "url": "https://github.com/Jean-PierreGassin/sendit/issues"
+  },
+  "os": [
+    "darwin"
+  ],
   "exports": {
     "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "Core/AirDrop/bin"

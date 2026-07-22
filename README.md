@@ -16,12 +16,18 @@ see [writing an engine](docs/writing-an-engine.md) to add more and help extend t
 ## Install
 
 ```sh
-npm i -g sendit
+npm i -g @sendit/cli
+```
+
+Or run without installing:
+
+```sh
+npx @sendit/cli ~/photo.jpg
 ```
 
 ## Requirements
 
-- The `sendit` package installs anywhere
+- The `@sendit/cli` package installs anywhere
 - Node 24+
 
 ## Usage

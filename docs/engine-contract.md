@@ -1,61 +1,64 @@
-# AirDrop engine protocol
+# Engine contract
 
-How the AirDrop engine's Swift binary (`packages/engines/macos/airdrop`) talks to the CLI: newline-delimited JSON on
-stdout. This protocol is specific to the AirDrop engine; `transfer/engines/airdrop/lib/parse-airdrop-engine-events.ts`
-parses exactly this shape.
+Every transfer engine - AirDrop today, a future Quick Share, a LAN drop, an SFTP push, a test double - satisfies the
+same contract: the `TransferEngine` TypeScript interface. That interface is the **only** thing the CLI depends on. How
+an engine talks to a binary, a network, or a native API underneath is its own concern and never leaks up to the CLI
+(AirDrop's own wire protocol is documented separately in [engines/airdrop.md](./engines/airdrop.md)).
 
-The contract every engine shares is the `TransferEngine` TypeScript interface, **not** this wire format (see
-[writing-an-engine.md](./writing-an-engine.md)). Another subprocess engine may adopt this NDJSON shape as a convenient
-template or define its own; an in-process engine skips a wire format entirely and just implements the interface.
+This page is the reference for the shared contract. To actually build and register an engine, follow
+[writing-an-engine.md](./writing-an-engine.md).
 
-## Transport
+## The interface
 
-- The CLI spawns the engine with one argv entry per absolute file path.
-- The engine writes newline-delimited JSON to **stdout**, one object per line. Nothing else may go to stdout.
-- Diagnostics go to stderr, which the CLI inherits.
-- The parser ignores any line it does not recognise, so extra event types can be added without breaking the CLI.
+`packages/cli/src/transfer/types/transfer-engine.ts`:
 
-## Events
+```ts
+export interface TransferEngine {
+  readonly id: string; // selector key for --engine, e.g. "airdrop"
+  readonly name: string; // shown in the UI, e.g. "AirDrop"
 
-```text
-{"event":"started","files":["/abs/a.jpg","/abs/b.png"]}
-{"event":"complete"}
-{"event":"failed","reason":"cancelled","code":-128}
+  send(
+    onStarted: TransferStartedListener,
+    filePaths: string[],
+  ): Promise<TransferResult>;
+}
 ```
 
-| Event      | When                                        | Fields           |
-| ---------- | ------------------------------------------- | ---------------- |
-| `started`  | Once, when the share begins                 | `files`          |
-| `complete` | Transfer accepted by the receiver; exit `0` | none             |
-| `failed`   | Transfer failed or cancelled; exit non-zero | `reason`, `code` |
+- `id` is the stable key `--engine=<id>` accepts and the saved default persists.
+- `name` is how the transport appears in the spinner ("Sending 3 files via <name>").
+- `send` receives absolute paths, calls `onStarted(files)` once the transfer begins, and resolves a `TransferResult`.
 
-`code` is the underlying platform error code, or `0` when no error object exists.
+The reporter and CLI depend only on this interface, so a conforming engine needs no wiring beyond being registered.
+
+## Result
+
+`send` resolves one of two shapes (`transfer/types/transfer-result.ts`):
+
+- Success: `{ isSent: true }`.
+- Failure: `createFailedTransfer(reason, code)`, which returns `{ isSent: false, reason, code }`.
+
+`onStarted` must fire **exactly once**, when the transfer actually begins, so the reporter can start its spinner. For an
+immediate failure (an unsupported platform, no files) resolve a failure result without ever calling `onStarted`.
 
 ## Failure reasons
 
-`reason` is a short, transport-neutral slug. Engines should reuse these where they fit; the CLI renders any unknown slug
-as a generic failure.
+`reason` is a short, transport-neutral slug. The reporter maps these to messages; reuse them where they fit, and any
+slug it does not recognise renders as a generic failure.
 
-| `reason`      | Meaning                                                      |
-| ------------- | ------------------------------------------------------------ |
-| `cancelled`   | User dismissed the transfer (AirDrop: `NSError` code `-128`) |
-| `unavailable` | The transport cannot run for these items on this device      |
-| `no-files`    | The engine was invoked with no paths                         |
-| `failed`      | Any other transport failure; see `code`                      |
+| `reason`      | Meaning                                                 |
+| ------------- | ------------------------------------------------------- |
+| `cancelled`   | User dismissed the transfer                             |
+| `unavailable` | The transport cannot run for these items on this device |
+| `no-files`    | The engine was invoked with no paths                    |
+| `failed`      | Any other transport failure; see `code`                 |
 
-`engine-error` is synthesised by the CLI when the engine exits without emitting a terminal event; engines do not emit
-it.
+`code` is the underlying platform error code, or `0` when none applies. Engines emit the slugs above; the CLI itself
+synthesises one more, `engine-error`, when a subprocess engine exits without ever resolving a terminal result. Engines
+never emit `engine-error`.
 
-## Exit codes
+## Selection
 
-| Code | Meaning                                     |
-| ---- | ------------------------------------------- |
-| `0`  | `complete` emitted                          |
-| `1`  | `failed` emitted                            |
-| `2`  | Internal error (event could not be encoded) |
-
-## Non-goals
-
-The AirDrop engine exposes no progress percentage, no headless recipient selection, and no "waiting for acceptance"
-event, so the contract omits them rather than faking them. An engine with richer signals can add new `v`-guarded event
-types without breaking existing CLIs.
+Engines are chosen by `id` through the registry (`transfer/lib/engine-registry.ts`). `--engine=<id>`, the bare
+`--engine` / `--default-engine` picker, the saved default, and the single-engine fallback all resolve through that one
+map, so nothing downstream cares which engine ran. Registering an engine is covered in
+[writing-an-engine.md](./writing-an-engine.md).

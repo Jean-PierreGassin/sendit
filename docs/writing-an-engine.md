@@ -3,9 +3,9 @@
 `sendit` sends files through a **transfer engine**. AirDrop is the first one; this guide shows how to add another (Quick
 Share, a LAN drop, an SFTP push, a test double) without touching the CLI's UI or argument handling.
 
-The shared contract is the `TransferEngine` interface below. AirDrop's own wire protocol
-([engine-contract.md](./engine-contract.md)) is just how its Swift binary talks to its wrapper: a reference, not a
-requirement.
+The shared contract is the `TransferEngine` interface, defined in full in [engine-contract.md](./engine-contract.md) and
+recapped below. AirDrop's own wire protocol ([engines/airdrop.md](./engines/airdrop.md)) is just how its Swift binary
+talks to its wrapper: one engine's implementation detail, not a requirement.
 
 ## The interface
 
@@ -61,7 +61,7 @@ Best when the transport needs a different language or a native binary (AirDrop's
 
 The wire format between your binary and its engine wrapper is yours to define; it is an implementation detail of your
 engine, not a shared contract. The AirDrop engine uses a small NDJSON protocol
-([engine-contract.md](./engine-contract.md)) with its own `parse-airdrop-engine-events.ts`; copy that shape if it fits,
+([engines/airdrop.md](./engines/airdrop.md)) with its own `parse-airdrop-engine-events.ts`; copy that shape if it fits,
 or roll your own. `packages/cli/src/transfer/engines/airdrop/lib/airdrop-engine.ts` is the reference.
 
 ## Registering your engine

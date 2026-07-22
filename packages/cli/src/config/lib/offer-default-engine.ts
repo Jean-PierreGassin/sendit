@@ -1,6 +1,6 @@
 import { EngineId } from '../../transfer/types/engine-id.js';
+import { confirm } from '../../prompt/lib/confirm.js';
 import { configFilePath, saveDefaultEngine } from './config-store.js';
-import { confirm } from './confirm.js';
 
 /**
  * After a successful send, offers to persist the engine just used as the

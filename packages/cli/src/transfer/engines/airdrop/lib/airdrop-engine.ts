@@ -23,7 +23,7 @@ interface EngineBinary {
 }
 
 const ENGINE_BINARY: EngineBinary = {
-  package: '@sendit/airdrop',
+  package: '@globb/airdrop',
   subpath: 'Core/AirDrop/bin/airdrop',
   spawnFailedCode: -1,
 };

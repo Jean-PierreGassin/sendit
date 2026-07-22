@@ -29,7 +29,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@sendit/airdrop':
+      '@globb/airdrop':
         specifier: workspace:*
         version: link:../engines/macos/airdrop
       commander:

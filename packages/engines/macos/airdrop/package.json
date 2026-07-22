@@ -1,5 +1,5 @@
 {
-  "name": "@sendit/airdrop",
+  "name": "@globb/airdrop",
   "version": "0.1.0",
   "description": "Prebuilt Swift AirDrop engine (NSSharingService) emitting NDJSON transfer events. Runs on macOS only.",
   "license": "MIT",

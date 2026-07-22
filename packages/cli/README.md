@@ -1,16 +1,16 @@
-# @sendit/cli
+# @globb/sendit
 
 Send files from your terminal through pluggable transfer engines (AirDrop on macOS).
 
 ```sh
-npx @sendit/cli ~/Pictures/holiday.jpg
-npx @sendit/cli file-a.png file-b.pdf
+npx @globb/sendit ~/Pictures/holiday.jpg
+npx @globb/sendit file-a.png file-b.pdf
 ```
 
 ## Install
 
 ```sh
-npm i -g @sendit/cli
+npm i -g @globb/sendit
 ```
 
 The `sendit` command is then available globally.

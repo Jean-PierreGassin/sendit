@@ -1,5 +1,5 @@
 {
-  "name": "@sendit/cli",
+  "name": "@globb/sendit",
   "version": "0.1.0",
   "description": "Send files from the terminal through pluggable transfer engines (AirDrop on macOS)",
   "type": "module",
@@ -38,7 +38,7 @@
     "dev": "tsc -p tsconfig.json --watch"
   },
   "dependencies": {
-    "@sendit/airdrop": "workspace:*",
+    "@globb/airdrop": "workspace:*",
     "commander": "^14.0.2",
     "ora": "^9.0.0"
   },

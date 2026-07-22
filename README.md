@@ -16,18 +16,18 @@ see [writing an engine](docs/writing-an-engine.md) to add more and help extend t
 ## Install
 
 ```sh
-npm i -g @sendit/cli
+npm i -g @globb/sendit
 ```
 
 Or run without installing:
 
 ```sh
-npx @sendit/cli ~/photo.jpg
+npx @globb/sendit ~/photo.jpg
 ```
 
 ## Requirements
 
-- The `@sendit/cli` package installs anywhere
+- The `@globb/sendit` package installs anywhere
 - Node 24+
 
 ## Usage

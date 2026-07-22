@@ -6,7 +6,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "pnpm --filter @sendit/cli build",
+    "build": "pnpm --filter @globb/sendit build",
     "build:engine": "packages/engines/macos/airdrop/build.sh",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

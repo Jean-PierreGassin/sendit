@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { chmodSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +15,12 @@ import type { TransferResult } from '../../../types/transfer-result.js';
 
 const SUPPORTED_PLATFORM = 'darwin';
 const UNSUPPORTED_PLATFORM_CODE = 0;
+
+/**
+ * npm publishes non-`bin` files as `0644`, stripping the committed binary's
+ * executable bit, so it is restored on the installed copy before spawning.
+ */
+const ENGINE_BINARY_MODE = 0o755;
 
 /** Where the committed Swift binary lives inside its workspace package. */
 interface EngineBinary {
@@ -48,7 +55,10 @@ export class AirDropEngine implements TransferEngine {
       return createFailedTransfer('unavailable', UNSUPPORTED_PLATFORM_CODE);
     }
 
-    const engine = spawn(resolveEngineBinaryPath(), filePaths, {
+    const engineBinaryPath = resolveEngineBinaryPath();
+    ensureEngineBinaryExecutable(engineBinaryPath);
+
+    const engine = spawn(engineBinaryPath, filePaths, {
       stdio: ['ignore', 'pipe', 'inherit'],
     });
     const engineOutput = createInterface({ input: engine.stdout });
@@ -98,6 +108,19 @@ function applyEngineEvent(
   }
   if (airDropEvent.type === AirDropEventType.failed) {
     resolveResult(createFailedTransfer(airDropEvent.reason, airDropEvent.code));
+  }
+}
+
+/**
+ * Restores the binary's executable bit, which npm strips on publish. A local
+ * checkout is already executable, so a failure here (e.g. a read-only install)
+ * is left for the spawn to surface as an engine error.
+ */
+function ensureEngineBinaryExecutable(binaryPath: string): void {
+  try {
+    chmodSync(binaryPath, ENGINE_BINARY_MODE);
+  } catch {
+    // Already executable, or the install is read-only; let spawn report it.
   }
 }
 

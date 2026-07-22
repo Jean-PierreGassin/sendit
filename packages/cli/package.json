@@ -1,6 +1,6 @@
 {
   "name": "@globb/sendit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Send files from the terminal through pluggable transfer engines (AirDrop on macOS)",
   "type": "module",
   "license": "MIT",

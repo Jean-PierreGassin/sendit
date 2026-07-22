@@ -1,0 +1,15 @@
+{
+  "name": "@sendit/airdrop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prebuilt Swift AirDrop engine (NSSharingService) emitting NDJSON transfer events. Runs on macOS only.",
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "Core/AirDrop/bin"
+  ],
+  "scripts": {
+    "build": "./build.sh"
+  }
+}

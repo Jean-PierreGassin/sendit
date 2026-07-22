@@ -1,0 +1,28 @@
+{
+  "name": "sendit",
+  "version": "0.1.0",
+  "description": "Send files from the terminal through pluggable transfer engines (AirDrop on macOS)",
+  "type": "module",
+  "bin": {
+    "sendit": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@sendit/airdrop": "workspace:*",
+    "commander": "^14.0.2",
+    "ora": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}

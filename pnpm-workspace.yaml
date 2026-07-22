@@ -1,0 +1,5 @@
+packages:
+  - packages/cli
+  - packages/engines/*/*
+minimumReleaseAgeExclude:
+  - prettier@3.9.6
